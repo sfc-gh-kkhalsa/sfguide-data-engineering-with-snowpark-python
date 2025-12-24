@@ -12,8 +12,18 @@ if len(sys.argv) != 2:
 root_directory = sys.argv[1]
 print(f"Deploying all Snowpark apps in root directory {root_directory}")
 
+key_path = os.path.join(root_directory, 'key.p8')
+
 # Walk the entire directory structure recursively
 for (directory_path, directory_names, file_names) in os.walk(root_directory):
+
+    common_flags = (
+        f"--temporary-connection --account $SNOWFLAKE_ACCOUNT "
+        f"--user $SNOWFLAKE_USER --role $SNOWFLAKE_ROLE "
+        f"--warehouse $SNOWFLAKE_WAREHOUSE --database $SNOWFLAKE_DATABASE "
+        f"--authenticator SNOWFLAKE_JWT "
+        f"--private-key-file {key_path}"
+    )
     # Get just the last/final folder name in the directory path
     base_name = os.path.basename(directory_path)
 
@@ -48,5 +58,5 @@ for (directory_path, directory_names, file_names) in os.walk(root_directory):
     
     # Make sure all 6 SNOWFLAKE_ environment variables are set
     # SnowCLI accesses the passowrd directly from the SNOWFLAKE_PASSWORD environmnet variable
-    os.system(f"snow snowpark build --temporary-connection --account $SNOWFLAKE_ACCOUNT --user $SNOWFLAKE_USER --role $SNOWFLAKE_ROLE --warehouse $SNOWFLAKE_WAREHOUSE --database $SNOWFLAKE_DATABASE --private-key-file key.p8 --authenticator SNOWFLAKE_JWT" )
-    os.system(f"snow snowpark deploy --replace --temporary-connection --account $SNOWFLAKE_ACCOUNT --user $SNOWFLAKE_USER --role $SNOWFLAKE_ROLE --warehouse $SNOWFLAKE_WAREHOUSE --database $SNOWFLAKE_DATABASE --private-key-file key.p8 --authenticator = SNOWFLAKE_JWT")
+    os.system(f"snow snowpark build {common_flags}" )
+    os.system(f"snow snowpark deploy --replace {common_flags}")
