@@ -3,6 +3,7 @@
 
 # Snowpark specific files
 creds.json
+snowflake_key_unencrypted.p8
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

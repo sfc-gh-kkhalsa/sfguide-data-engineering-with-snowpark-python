@@ -26,12 +26,21 @@ jobs:
       - name: Install Python packages
         run: pip install -r requirements.txt
 
+      - name: Write key to file
+        run: |
+          echo "$SNOWFLAKE_PRIVATE_KEY" > key.p8
+          chmod 600 key.p8
+        env:
+          SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+
       - name: Deploy Snowpark apps
         env:
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
           SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
-          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
           SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
           SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
           SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+          SNOWFLAKE_KEY_PASSPHRASE: ${{ secrets.SNOWFLAKE_KEY_PASSPHRASE }}
+          USE_PASSPHRASE: ${{ secrets.USE_PASSPHRASE }}
+
         run: python deploy_snowpark_apps.py $GITHUB_WORKSPACE
